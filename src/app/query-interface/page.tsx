@@ -6,15 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send } from "lucide-react"; // Ensure this import is correct
-import LangflowClient from "@/utils/LangflowClient";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Send } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
- 
+
+const parseResponse = (content: string): string => {
+  // Replace double stars with nothing
+  const cleanedContent = content.replace(/\*\*/g, "");
+
+  // Replace stars (*) with bullet points (•)
+  const bulletPoints = cleanedContent.replace(/^\s*\*/gm, "•");
+
+  // Add a new line before the first bullet point without using the /s flag
+  const firstBulletPointIndex = bulletPoints.indexOf("•");
+  if (firstBulletPointIndex !== -1) {
+    return (
+      bulletPoints.slice(0, firstBulletPointIndex) + // Text before the first bullet point
+      "\n" + // Add a new line
+      bulletPoints.slice(firstBulletPointIndex) // Text from the first bullet point onward
+    );
+  }
+
+  return bulletPoints; // If no bullet points exist, return as is
+};
+
+const flowId = process.env.NEXT_PUBLIC_FLOW_ID!;
+const langflowId = process.env.NEXT_PUBLIC_LANGFLOW_ID!;
 
 export default function QueryInterface() {
   const [input, setInput] = useState("");
@@ -29,63 +50,79 @@ export default function QueryInterface() {
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const langflowClient = new LangflowClient(
-    "https://api.langflow.astra.datastax.com",
-    "AstraCS:ONNXLyQLtZCIXZuiwIeQvAFu:df8e372358fb3c2e744392fd0211e3b0066e6b8d8223d8c0149e8bba453d95e3"
-  );
+  // Remove or comment out the local LangflowClient definition
+  // const langflowClient = new LangflowClient(...);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
+    const savedMessages = localStorage.getItem("chatMessages");
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
+  }, []);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages]);
+    localStorage.setItem("chatMessages", JSON.stringify(messages));
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim()) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Please enter a valid query." },
+      ]);
+      return;
+    }
+
+    if (isLoading) return;
 
     const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    // Replace with actual API call
     try {
+      // Call our new /api/rag endpoint
+      const response = await fetch("/api/rag", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          flowId: flowId,
+          langflowId: langflowId,
+          inputValue: input,
+          inputType: "chat",
+          outputType: "chat",
+          tweaks: {
+            "Prompt-uBxb1": {},
+            // ... your other tweaks
+          },
+        }),
+      });
 
-      const tweaks = {
-        "Prompt-uBxb1": {},
-        "SplitText-oipej": {},
-        "AstraDB-viQgD": {},
-        "File-rZi3k": {},
-        "GroqModel-EV7Wo": {},
-        "ChatOutput-wIeA7": {},
-        "ParseData-ejneO": {},
-        "ChatInput-atY9u": {},
-        "CombineText-hbhRv": {},
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const { success, data, error } = await response.json();
+
+      if (!success) {
+        throw new Error(error || "Unknown error from /api/rag");
+      }
+
+      // Based on how your API returns data, you can adjust this:
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: parseResponse(
+          data.outputs[0].outputs[0].outputs.message.message.text
+        ),
       };
 
-      const result = await langflowClient.runFlow(
-        "86e5d8b9-d81f-4658-ad9d-4c94758011ac", // flowId
-        "01d3ed92-87e8-4377-b1db-72b1aff1de65", // langflowId
-        input,
-        "chat", // inputType
-        "chat", // outputType
-        tweaks,
-        false, // stream (set to true for streaming responses)
-        (data: any) => console.log("Received Stream:", data), // onUpdate
-        (message: any) => console.log("Stream Closed:", message), // onClose
-        (error: any) => console.error("Stream Error:", error) // onError
-      );
-
-      if (result && result.outputs) {
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: result.outputs[0].outputs[0].outputs.message.message.text,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-      }
-    } catch (error) {
-      console.error("Error fetching response:", error);
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error("Error fetching response:", err);
       setMessages((prev) => [
         ...prev,
         {
@@ -96,21 +133,6 @@ export default function QueryInterface() {
     } finally {
       setIsLoading(false);
     }
-
-    //   const response = await new Promise<Message>((resolve) =>
-    //     setTimeout(() => {
-    //       resolve({
-    //         role: "assistant",
-    //         content: `Here's an analysis based on your query "${input}": [Simulated response with insights about social media engagement, post performance, etc.]`,
-    //       });
-    //     }, 1000)
-    //   );
-    //   setMessages((prev) => [...prev, response]);
-    // } catch (error) {
-    //   console.error("Error fetching response:", error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
   };
 
   return (
@@ -150,7 +172,7 @@ export default function QueryInterface() {
                         message.role === "user"
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-black"
-                      }`}
+                      } whitespace-pre-wrap`}
                     >
                       {message.content}
                     </div>
