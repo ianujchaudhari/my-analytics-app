@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Send } from "lucide-react";
+import { Send, ArrowLeft } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -138,15 +138,23 @@ export default function QueryInterface() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-violet-100 to-pink-100">
       <header className="px-4 lg:px-6 h-14 flex items-center border-b backdrop-blur-lg bg-white/50">
-        <Button variant="ghost" onClick={() => router.push("/")} className="text-gray-800">
-          Back to Home
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/")}
+          className="text-white hover:text-white bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600"
+        >
+          <ArrowLeft /> Back to Home
         </Button>
-        <h1 className="ml-4 text-xl font-semibold text-gray-800">AI Analytics Assistant</h1>
+        <h1 className="ml-4 text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+          TrendLytix
+        </h1>
       </header>
       <main className="flex-1 p-4 md:p-6 flex justify-center">
         <Card className="w-full max-w-4xl flex flex-col h-[85vh] bg-white/50 backdrop-blur-lg border-none shadow-lg">
           <CardHeader className="border-b bg-white/50">
-            <CardTitle className="text-xl text-gray-800">Chat with Your Analytics AI</CardTitle>
+            <CardTitle className="text-xl text-gray-700">
+              Chat with Your Analytics AI
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
             <ScrollArea className="flex-1 p-4 h-[calc(85vh-8rem)]">
@@ -163,7 +171,13 @@ export default function QueryInterface() {
                     }`}
                   >
                     <Avatar className="w-8 h-8 border-2 border-white/50">
-                      <AvatarFallback className={message.role === "user" ? "bg-indigo-500 text-white" : "bg-violet-500 text-white"}>
+                      <AvatarFallback
+                        className={
+                          message.role === "user"
+                            ? "bg-indigo-500 text-white"
+                            : "bg-violet-500 text-white"
+                        }
+                      >
                         {message.role === "user" ? "U" : "AI"}
                       </AvatarFallback>
                     </Avatar>
@@ -187,10 +201,10 @@ export default function QueryInterface() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about your social media analytics..."
-                  className="flex-1 bg-white/50 border-gray-200"
+                  className="flex-1 bg-white/50 border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 placeholder-indigo-600 "
                 />
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   size="icon"
                   disabled={isLoading}
                   className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600"
