@@ -143,21 +143,22 @@ export default function QueryInterface() {
           onClick={() => router.push("/")}
           className="text-white hover:text-white bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600"
         >
-          <ArrowLeft /> Back to Home
+          <ArrowLeft className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+          <span className="hidden sm:inline">Back to Home</span>
         </Button>
-        <h1 className="ml-4 text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+        <h1 className="ml-4 text-lg sm:text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
           TrendLytix
         </h1>
       </header>
-      <main className="flex-1 p-4 md:p-6 flex justify-center">
-        <Card className="w-full max-w-4xl flex flex-col h-[85vh] bg-white/50 backdrop-blur-lg border-none shadow-lg">
+      <main className="flex-1 p-2 sm:p-4 md:p-6 flex justify-center">
+        <Card className="w-full max-w-4xl flex flex-col h-[90vh] sm:h-[85vh] bg-white/50 backdrop-blur-lg border-none shadow-lg">
           <CardHeader className="border-b bg-white/50">
-            <CardTitle className="text-xl text-gray-700">
+            <CardTitle className="text-lg sm:text-xl text-gray-700">
               Chat with Your Analytics AI
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-            <ScrollArea className="flex-1 p-4 h-[calc(85vh-8rem)]">
+            <ScrollArea className="flex-1 p-2 sm:p-4 h-[calc(90vh-10rem)] sm:h-[calc(85vh-8rem)]">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -166,11 +167,11 @@ export default function QueryInterface() {
                   } mb-4`}
                 >
                   <div
-                    className={`flex items-start gap-3 max-w-[80%] ${
+                    className={`flex items-start gap-2 sm:gap-3 max-w-[90%] sm:max-w-[80%] ${
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    <Avatar className="w-8 h-8 border-2 border-white/50">
+                    <Avatar className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-white/50">
                       <AvatarFallback
                         className={
                           message.role === "user"
@@ -182,7 +183,7 @@ export default function QueryInterface() {
                       </AvatarFallback>
                     </Avatar>
                     <div
-                      className={`p-3 rounded-2xl ${
+                      className={`p-2 sm:p-3 rounded-2xl text-sm sm:text-base ${
                         message.role === "user"
                           ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white"
                           : "bg-white/80 text-gray-800 shadow-sm"
@@ -195,13 +196,13 @@ export default function QueryInterface() {
               ))}
               <div ref={messagesEndRef} />
             </ScrollArea>
-            <div className="p-4 border-t bg-white/50 backdrop-blur-sm">
+            <div className="p-2 sm:p-4 border-t bg-white/50 backdrop-blur-sm">
               <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about your social media analytics..."
-                  className="flex-1 bg-white/50 border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 placeholder-indigo-600 "
+                  className="flex-1 bg-white/50 border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 placeholder-indigo-600 text-sm sm:text-base"
                 />
                 <Button
                   type="submit"
