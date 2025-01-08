@@ -1,9 +1,26 @@
 import { NextResponse } from "next/server";
 
 // Define callback types if you're using streaming features
-type OnUpdate = (data: any) => void;
+type OnUpdate = (data: unknown) => void;
 type OnClose = (message: string) => void;
-type OnError = (error: any) => void;
+type OnError = (error: Error) => void;
+
+interface LangflowResponse {
+  outputs?: Array<{
+    outputs: Array<{
+      artifacts?: {
+        stream_url?: string;
+      };
+      outputs?: {
+        message?: {
+          message?: {
+            text?: string;
+          };
+        };
+      };
+    }>;
+  }>;
+}
 
 class LangflowClient {
   private baseURL: string;
@@ -22,9 +39,9 @@ class LangflowClient {
    */
   async post(
     endpoint: string,
-    body: Record<string, any>,
+    body: Record<string, unknown>,
     headers: Record<string, string> = { "Content-Type": "application/json" }
-  ): Promise<any> {
+  ): Promise<LangflowResponse> {
     headers["Authorization"] = `Bearer ${this.applicationToken}`;
     headers["Content-Type"] = "application/json";
     const url = `${this.baseURL}${endpoint}`;
@@ -45,8 +62,8 @@ class LangflowClient {
         );
       }
       return responseMessage;
-    } catch (error: any) {
-      console.error("Request Error:", error.message);
+    } catch (error) {
+      console.error("Request Error:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -61,8 +78,8 @@ class LangflowClient {
     inputType: string = "chat",
     outputType: string = "chat",
     stream: boolean = false,
-    tweaks: Record<string, any> = {}
-  ): Promise<any> {
+    tweaks: Record<string, unknown> = {}
+  ): Promise<LangflowResponse> {
     const endpoint = `/lf/${langflowId}/api/v1/run/${flowId}?stream=${stream}`;
     return this.post(endpoint, {
       input_value: inputValue,
@@ -90,7 +107,7 @@ class LangflowClient {
 
     eventSource.onerror = (event: Event) => {
       console.error("Stream Error:", event);
-      onError(event);
+      onError(new Error("Stream error occurred"));
       eventSource.close();
     };
 
@@ -111,12 +128,12 @@ class LangflowClient {
     inputValue: string,
     inputType: string = "chat",
     outputType: string = "chat",
-    tweaks: Record<string, any> = {},
+    tweaks: Record<string, unknown> = {},
     stream: boolean = false,
     onUpdate?: OnUpdate,
     onClose?: OnClose,
     onError?: OnError
-  ): Promise<any> {
+  ): Promise<LangflowResponse> {
     try {
       const initResponse = await this.initiateSession(
         flowIdOrName,
@@ -145,10 +162,10 @@ class LangflowClient {
       console.log(initResponse)
 
       return initResponse;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error running flow:", error);
       if (onError) {
-        onError("Error initiating session");
+        onError(error instanceof Error ? error : new Error("Unknown error"));
       }
       throw error;
     }
@@ -181,10 +198,10 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json({ success: true, data: result });
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
