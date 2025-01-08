@@ -53,16 +53,16 @@ export default function QueryInterface() {
   // Remove or comment out the local LangflowClient definition
   // const langflowClient = new LangflowClient(...);
 
-  useEffect(() => {
-    const savedMessages = localStorage.getItem("chatMessages");
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedMessages = localStorage.getItem("chatMessages");
+  //   if (savedMessages) {
+  //     setMessages(JSON.parse(savedMessages));
+  //   }
+  // }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    localStorage.setItem("chatMessages", JSON.stringify(messages));
+    // localStorage.setItem("chatMessages", JSON.stringify(messages));
   }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
