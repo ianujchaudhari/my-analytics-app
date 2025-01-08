@@ -136,20 +136,20 @@ export default function QueryInterface() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-        <Button variant="ghost" onClick={() => router.push("/")}>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-violet-100 to-pink-100">
+      <header className="px-4 lg:px-6 h-14 flex items-center border-b backdrop-blur-lg bg-white/50">
+        <Button variant="ghost" onClick={() => router.push("/")} className="text-gray-800">
           Back to Home
         </Button>
-        <h1 className="ml-4 text-lg font-semibold">AI Analytics Assistant</h1>
+        <h1 className="ml-4 text-xl font-semibold text-gray-800">AI Analytics Assistant</h1>
       </header>
       <main className="flex-1 p-4 md:p-6 flex justify-center">
-        <Card className="w-full max-w-4xl flex flex-col h-full">
-          <CardHeader>
-            <CardTitle>Chat with Your Analytics AI</CardTitle>
+        <Card className="w-full max-w-4xl flex flex-col h-[85vh] bg-white/50 backdrop-blur-lg border-none shadow-lg">
+          <CardHeader className="border-b bg-white/50">
+            <CardTitle className="text-xl text-gray-800">Chat with Your Analytics AI</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <ScrollArea className="flex-1 pr-4">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+            <ScrollArea className="flex-1 p-4 h-[calc(85vh-8rem)]">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -158,20 +158,20 @@ export default function QueryInterface() {
                   } mb-4`}
                 >
                   <div
-                    className={`flex items-start ${
+                    className={`flex items-start gap-3 max-w-[80%] ${
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback>
+                    <Avatar className="w-8 h-8 border-2 border-white/50">
+                      <AvatarFallback className={message.role === "user" ? "bg-indigo-500 text-white" : "bg-violet-500 text-white"}>
                         {message.role === "user" ? "U" : "AI"}
                       </AvatarFallback>
                     </Avatar>
                     <div
-                      className={`mx-2 p-3 rounded-lg ${
+                      className={`p-3 rounded-2xl ${
                         message.role === "user"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-black"
+                          ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white"
+                          : "bg-white/80 text-gray-800 shadow-sm"
                       } whitespace-pre-wrap`}
                     >
                       {message.content}
@@ -181,17 +181,24 @@ export default function QueryInterface() {
               ))}
               <div ref={messagesEndRef} />
             </ScrollArea>
-            <form onSubmit={handleSubmit} className="flex items-center mt-4">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about your social media analytics..."
-                className="flex-1 mr-2"
-              />
-              <Button type="submit" size="icon" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
+            <div className="p-4 border-t bg-white/50 backdrop-blur-sm">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about your social media analytics..."
+                  className="flex-1 bg-white/50 border-gray-200"
+                />
+                <Button 
+                  type="submit" 
+                  size="icon"
+                  disabled={isLoading}
+                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
           </CardContent>
         </Card>
       </main>
