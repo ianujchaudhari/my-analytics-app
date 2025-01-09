@@ -171,7 +171,7 @@ export default function QueryInterface() {
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    <Avatar className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-white/50">
+                    <Avatar className="w-6 h-6 text-xs md:text-base sm:w-8 sm:h-8 border-2 border-white/50">
                       <AvatarFallback
                         className={
                           message.role === "user"
@@ -194,6 +194,22 @@ export default function QueryInterface() {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex items-start gap-2 sm:gap-3 max-w-[90%] sm:max-w-[80%] flex-row">
+                  <Avatar className="w-6 h-6 text-xs md:text-base sm:w-8 sm:h-8 border-2 border-white/50">
+                    <AvatarFallback className="bg-violet-500 text-white">
+                      AI
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="p-2 sm:p-3 rounded-2xl text-sm sm:text-base bg-white/80 text-gray-800 shadow-sm">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </ScrollArea>
             <div className="p-2 sm:p-4 border-t bg-white/50 backdrop-blur-sm">
