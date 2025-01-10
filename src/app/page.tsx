@@ -45,7 +45,7 @@ export default function LandingPage() {
 
             {/* Hero Section */}
             <section className="container mx-auto px-4 py-20 text-center">
-                <div className="mb-8 text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+                <div className="mb-6 pb-2 text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
                     TrendLytix
                 </div>
                 <p className="mb-8 text-xl text-gray-600 max-w-2xl mx-auto">
